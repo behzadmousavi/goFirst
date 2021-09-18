@@ -10,7 +10,7 @@ import (
 
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/", nil)
+	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/add", addNumber)
 	myRouter.HandleFunc("/deduct", deductNumber)
 	myRouter.HandleFunc("/multiply", multiplyNumber)
@@ -18,43 +18,47 @@ func handleRequests() {
 	log.Fatal(http.ListenAndServe(":8080", myRouter))
 }
 
+func homePage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Welcome to my Golang playground!\n")
+}
+
 func addNumber(w http.ResponseWriter, r *http.Request) {
 	firstNumber := r.FormValue("first")
 	secondNumber := r.FormValue("second")
-	firstNumberInt, _ := strconv.Atoi(firstNumber)
-	secondNumberInt, _ := strconv.Atoi(secondNumber)
-	var summation int
-	summation = firstNumberInt + secondNumberInt
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
+	var summation float32
+	summation = float32(firstNumberFloat + secondNumberFloat)
 	fmt.Fprintln(w, summation)
 }
 
 func deductNumber(w http.ResponseWriter, r *http.Request) {
 	firstNumber := r.FormValue("first")
 	secondNumber := r.FormValue("second")
-	firstNumberInt, _ := strconv.Atoi(firstNumber)
-	secondNumberInt, _ := strconv.Atoi(secondNumber)
-	var deduction int
-	deduction = firstNumberInt - secondNumberInt
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
+	var deduction float32
+	deduction = float32(firstNumberFloat - secondNumberFloat)
 	fmt.Fprintln(w, deduction)
 }
 
 func multiplyNumber(w http.ResponseWriter, r *http.Request) {
 	firstNumber := r.FormValue("first")
 	secondNumber := r.FormValue("second")
-	firstNumberInt, _ := strconv.Atoi(firstNumber)
-	secondNumberInt, _ := strconv.Atoi(secondNumber)
-	var multiplication int
-	multiplication = firstNumberInt * secondNumberInt
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
+	var multiplication float32
+	multiplication = float32(int(firstNumberFloat * secondNumberFloat))
 	fmt.Fprintln(w, multiplication)
 }
 
 func divideNumber(w http.ResponseWriter, r *http.Request) {
 	firstNumber := r.FormValue("first")
 	secondNumber := r.FormValue("second")
-	firstNumberInt, _ := strconv.Atoi(firstNumber)
-	secondNumberInt, _ := strconv.Atoi(secondNumber)
-	var division int
-	division = firstNumberInt / secondNumberInt
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
+	var division float32
+	division = float32(firstNumberFloat / secondNumberFloat)
 	fmt.Fprintln(w, division)
 }
 
