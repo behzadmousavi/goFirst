@@ -58,6 +58,9 @@ func divideNumber(w http.ResponseWriter, r *http.Request) {
 	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
 	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
 	var division float32
+	if secondNumberFloat == 0 {
+		fmt.Fprintln(w, "Cannot divide by zero!")
+	}
 	division = float32(firstNumberFloat / secondNumberFloat)
 	fmt.Fprintln(w, division)
 }
