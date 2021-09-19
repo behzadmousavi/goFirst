@@ -1,3 +1,3 @@
 This is a simple calculator which performs the 4 main mathematical operations on the two numbers given in query parameters of its routes.
-Two run the project, you won't have any hardship, simply clone or fork the project into your working directory, change the directory to the project directory and run ```go run server.go``` into your terminal.
+To run the project, you won't have any hardship, simply clone or fork the project into your working directory, change the directory to the project directory and run ```go run server.go``` in your terminal.
 The project is programmed to run on your 8080 server which you can change easily, currently the available routes are ```/add```,```/deduct```, ```/multiply``` and ```/divide``` and two query parameters as ```first``` and ```second``` will take your numbers.
