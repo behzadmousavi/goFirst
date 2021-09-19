@@ -1,71 +1,62 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gorilla/mux"
-	"log"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
 )
 
-func handleRequests() {
-	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/add", addNumber)
-	myRouter.HandleFunc("/deduct", deductNumber)
-	myRouter.HandleFunc("/multiply", multiplyNumber)
-	myRouter.HandleFunc("/divide", divideNumber)
-	log.Fatal(http.ListenAndServe(":8080", myRouter))
-}
-
-func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Welcome to my Golang playground!\n")
-}
-
-func addNumber(w http.ResponseWriter, r *http.Request) {
-	firstNumber := r.FormValue("first")
-	secondNumber := r.FormValue("second")
+func addNumber(c echo.Context) error {
+	firstNumber := c.QueryParam("first")
+	secondNumber := c.QueryParam("second")
 	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
 	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
 	var summation float32
 	summation = float32(firstNumberFloat + secondNumberFloat)
-	fmt.Fprintln(w, summation)
+	return c.JSON(http.StatusOK, summation)
 }
 
-func deductNumber(w http.ResponseWriter, r *http.Request) {
-	firstNumber := r.FormValue("first")
-	secondNumber := r.FormValue("second")
+func deductNumber(c echo.Context) error {
+	firstNumber := c.QueryParam("first")
+	secondNumber := c.QueryParam("second")
 	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
 	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
 	var deduction float32
 	deduction = float32(firstNumberFloat - secondNumberFloat)
-	fmt.Fprintln(w, deduction)
+	return c.JSON(http.StatusOK, deduction)
 }
 
-func multiplyNumber(w http.ResponseWriter, r *http.Request) {
-	firstNumber := r.FormValue("first")
-	secondNumber := r.FormValue("second")
+func multiplyNumber(c echo.Context) error {
+	firstNumber := c.QueryParam("first")
+	secondNumber := c.QueryParam("second")
 	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
 	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
 	var multiplication float32
 	multiplication = float32(int(firstNumberFloat * secondNumberFloat))
-	fmt.Fprintln(w, multiplication)
+	return c.JSON(http.StatusOK, multiplication)
 }
 
-func divideNumber(w http.ResponseWriter, r *http.Request) {
-	firstNumber := r.FormValue("first")
-	secondNumber := r.FormValue("second")
+func divideNumber(c echo.Context) error {
+	firstNumber := c.QueryParam("first")
+	secondNumber := c.QueryParam("second")
 	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
 	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
 	var division float32
 	if secondNumberFloat == 0 {
-		fmt.Fprintln(w, "Cannot divide by zero!")
+		return c.String(http.StatusBadRequest, "Cannot divide by zero!")
 	}
 	division = float32(firstNumberFloat / secondNumberFloat)
-	fmt.Fprintln(w, division)
+	return c.JSON(http.StatusOK, division)
 }
 
 func main() {
-	fmt.Printf("Starting server at port 8080\n")
-	handleRequests()
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Welcome to my go playground!")
+	})
+	e.GET("/add", addNumber)
+	e.GET("/deduct", deductNumber)
+	e.GET("/multiply", multiplyNumber)
+	e.GET("/divide", divideNumber)
+	e.Logger.Fatal(e.Start(":8181"))
 }
