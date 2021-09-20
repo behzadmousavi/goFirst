@@ -49,6 +49,29 @@ func divideNumber(c echo.Context) error {
 	return c.JSON(http.StatusOK, division)
 }
 
+func mathFunc(c echo.Context) error {
+	firstNumber := c.FormValue("first")
+	secondNumber := c.FormValue("second")
+	mathType := c.FormValue("operation")
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
+	var result float32
+	switch mathType {
+	case "add":
+		result = float32(firstNumberFloat + secondNumberFloat)
+	case "deduct":
+		result = float32(firstNumberFloat - secondNumberFloat)
+	case "multiply":
+		result = float32(int(firstNumberFloat * secondNumberFloat))
+	case "divide":
+		if secondNumberFloat == 0 {
+			return c.String(http.StatusBadRequest, "Cannot divide by zero!")
+		}
+		result = float32(firstNumberFloat / secondNumberFloat)
+	}
+	return c.JSON(http.StatusOK, result)
+}
+
 func main() {
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
@@ -58,5 +81,6 @@ func main() {
 	e.GET("/deduct", deductNumber)
 	e.GET("/multiply", multiplyNumber)
 	e.GET("/divide", divideNumber)
+	e.POST("/math", mathFunc)
 	e.Logger.Fatal(e.Start(":8181"))
 }
