@@ -54,7 +54,6 @@ func divideNumber(c echo.Context) error {
 
 func mathFunc(c echo.Context) error {
 	calc := Calculation{}
-
 	err := json.NewDecoder(c.Request().Body).Decode(&calc)
 	firstNumber := calc.First
 	secondNumber := calc.Second
