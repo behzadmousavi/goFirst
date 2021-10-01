@@ -1,73 +1,80 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
 )
 
+type Calculation struct {
+	First     float64 `json:"first"`
+	Second    float64 `json:"second"`
+	Operation string  `json:"operation"`
+}
+
 func addNumber(c echo.Context) error {
 	firstNumber := c.QueryParam("first")
 	secondNumber := c.QueryParam("second")
-	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
-	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
-	var summation float32
-	summation = float32(firstNumberFloat + secondNumberFloat)
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 64)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 64)
+	summation := float64(firstNumberFloat + secondNumberFloat)
 	return c.JSON(http.StatusOK, summation)
 }
 
 func deductNumber(c echo.Context) error {
 	firstNumber := c.QueryParam("first")
 	secondNumber := c.QueryParam("second")
-	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
-	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
-	var deduction float32
-	deduction = float32(firstNumberFloat - secondNumberFloat)
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 64)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 64)
+	deduction := float64(firstNumberFloat - secondNumberFloat)
 	return c.JSON(http.StatusOK, deduction)
 }
 
 func multiplyNumber(c echo.Context) error {
 	firstNumber := c.QueryParam("first")
 	secondNumber := c.QueryParam("second")
-	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
-	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
-	var multiplication float32
-	multiplication = float32(int(firstNumberFloat * secondNumberFloat))
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 64)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 64)
+	multiplication := float64(int(firstNumberFloat * secondNumberFloat))
 	return c.JSON(http.StatusOK, multiplication)
 }
 
 func divideNumber(c echo.Context) error {
 	firstNumber := c.QueryParam("first")
 	secondNumber := c.QueryParam("second")
-	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
-	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
-	var division float32
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 64)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 64)
 	if secondNumberFloat == 0 {
 		return c.String(http.StatusBadRequest, "Cannot divide by zero!")
 	}
-	division = float32(firstNumberFloat / secondNumberFloat)
+	division := float64(firstNumberFloat / secondNumberFloat)
 	return c.JSON(http.StatusOK, division)
 }
 
 func mathFunc(c echo.Context) error {
-	firstNumber := c.FormValue("first")
-	secondNumber := c.FormValue("second")
-	mathType := c.FormValue("operation")
-	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 32)
-	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 32)
-	var result float32
+	calc := Calculation{}
+
+	err := json.NewDecoder(c.Request().Body).Decode(&calc)
+	firstNumber := calc.First
+	secondNumber := calc.Second
+	mathType := calc.Operation
+	var result float64
 	switch mathType {
 	case "add":
-		result = float32(firstNumberFloat + secondNumberFloat)
+		result = float64(firstNumber + secondNumber)
 	case "deduct":
-		result = float32(firstNumberFloat - secondNumberFloat)
+		result = float64(firstNumber - secondNumber)
 	case "multiply":
-		result = float32(int(firstNumberFloat * secondNumberFloat))
+		result = float64(firstNumber * secondNumber)
 	case "divide":
-		if secondNumberFloat == 0 {
+		if secondNumber == 0 {
 			return c.String(http.StatusBadRequest, "Cannot divide by zero!")
 		}
-		result = float32(firstNumberFloat / secondNumberFloat)
+		result = float64(firstNumber / secondNumber)
+	}
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "")
 	}
 	return c.JSON(http.StatusOK, result)
 }
