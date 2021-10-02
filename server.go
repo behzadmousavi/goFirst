@@ -7,10 +7,15 @@ import (
 	"strconv"
 )
 
-type Calculation struct {
+type calculation struct {
 	First     float64 `json:"first"`
 	Second    float64 `json:"second"`
 	Operation string  `json:"operation"`
+}
+
+type calcResp struct {
+	Status int    `json:"status"`
+	Result string `json:"result"`
 }
 
 func addNumber(c echo.Context) error {
@@ -53,7 +58,8 @@ func divideNumber(c echo.Context) error {
 }
 
 func mathFunc(c echo.Context) error {
-	calc := Calculation{}
+	calc := calculation{}
+	response := calcResp{}
 	err := json.NewDecoder(c.Request().Body).Decode(&calc)
 	firstNumber := calc.First
 	secondNumber := calc.Second
@@ -68,14 +74,21 @@ func mathFunc(c echo.Context) error {
 		result = float64(firstNumber * secondNumber)
 	case "divide":
 		if secondNumber == 0 {
-			return c.String(http.StatusBadRequest, "Cannot divide by zero!")
+			response.Status = 1140
+			response.Result = "Cannot divide by zero!"
+			c.Bind(response)
+			return c.JSON(http.StatusBadRequest, response)
 		}
 		result = float64(firstNumber / secondNumber)
 	}
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "")
 	}
-	return c.JSON(http.StatusOK, result)
+	resultString := strconv.FormatFloat(result, 'f', -1, 64)
+	response.Status = 200
+	response.Result = resultString
+	c.Bind(response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func main() {
