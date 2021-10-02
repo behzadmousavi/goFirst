@@ -1,3 +1,5 @@
-This is a simple calculator which performs the 4 main mathematical operations on the two numbers given in query parameters of its routes.
-To run the project, you won't have any hardship, simply clone or fork the project into your working directory, change the directory to the project directory and run ```go run server.go``` in your terminal.
-The project is programmed to run on your 8080 server which you can change easily, currently the available routes are ```/add```,```/deduct```, ```/multiply``` and ```/divide``` and two query parameters as ```first``` and ```second``` will take your numbers.
+<b>goFirst</b><br />
+Written with [Echo](https://echo.labstack.com/), goFirst is a simple calculator which performs the 4 main mathematical operations on the two numbers given in query parameters of its routes or the body. <br />
+Asking yourself why it is named goFirst? There are two reasons for that, first this is my first go project, second the first thing comes to your mind when you want to do math is a calculator.<br />
+To run the project, you won't have any hardship, simply clone or fork the project into your working directory, change the directory to the project directory and run ```go run server.go``` in your terminal.<br />
+The project is programmed to run on your 8181 server which you can change easily, currently the available routes are ```/add```,```/deduct```, ```/multiply``` and ```/divide``` and two query parameters as ```first``` and ```second``` will take your numbers on GET method and ```/math``` on POST method will take your numbers and the mathematical operation to be performed.
