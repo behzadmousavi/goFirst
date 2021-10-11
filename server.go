@@ -1,16 +1,28 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/labstack/echo/v4"
+	_ "github.com/lib/pq"
 	"net/http"
 	"strconv"
+)
+
+const (
+	host     = "localhost"
+	port     = "5432"
+	user     = "postgres"
+	password = "9025038"
+	dbname   = "math_results"
 )
 
 type calculation struct {
 	First     float64 `json:"first"`
 	Second    float64 `json:"second"`
 	Operation string  `json:"operation"`
+	isSave    bool    `json:"is_save"`
 }
 
 type calcResp struct {
@@ -25,6 +37,24 @@ func addNumber(c echo.Context) error {
 	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 64)
 	summation := float64(firstNumberFloat + secondNumberFloat)
 	return c.JSON(http.StatusOK, summation)
+}
+
+func initDb() *sql.DB {
+	// DB Initializing
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Successfully connected!")
+	return db
 }
 
 func deductNumber(c echo.Context) error {
@@ -64,6 +94,7 @@ func mathFunc(c echo.Context) error {
 	firstNumber := calc.First
 	secondNumber := calc.Second
 	mathType := calc.Operation
+	isSave := calc.isSave
 	var result float64
 	switch mathType {
 	case "add":
@@ -88,11 +119,23 @@ func mathFunc(c echo.Context) error {
 	response.Status = 200
 	response.Result = resultString
 	c.Bind(response)
+	if isSave == false {
+		db := initDb()
+		sqlStatement := "insert into math_results (first_number, second_number, result, operation) " +
+			"values ($1, $2, $3, $4);"
+		_, err := db.Query(sqlStatement, calc.First, calc.Second, resultString, calc.Operation)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 	return c.JSON(http.StatusOK, response)
 }
 
 func main() {
+	// Echo Instance Initializing
 	e := echo.New()
+
+	// Routes
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Welcome to my go playground!")
 	})
