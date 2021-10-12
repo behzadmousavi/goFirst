@@ -12,9 +12,9 @@ import (
 
 const (
 	host     = "localhost"
-	port     = "5432"
+	port     = 5432
 	user     = "postgres"
-	password = "9025038"
+	password = "newsecret"
 	dbname   = "math_results"
 )
 
@@ -22,7 +22,7 @@ type calculation struct {
 	First     float64 `json:"first"`
 	Second    float64 `json:"second"`
 	Operation string  `json:"operation"`
-	isSave    bool    `json:"is_save"`
+	IsSave    bool    `json:"is_save"`
 }
 
 type calcResp struct {
@@ -48,7 +48,6 @@ func initDb() *sql.DB {
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 	err = db.Ping()
 	if err != nil {
 		panic(err)
@@ -94,7 +93,7 @@ func mathFunc(c echo.Context) error {
 	firstNumber := calc.First
 	secondNumber := calc.Second
 	mathType := calc.Operation
-	isSave := calc.isSave
+	isSave := calc.IsSave
 	var result float64
 	switch mathType {
 	case "add":
@@ -119,8 +118,7 @@ func mathFunc(c echo.Context) error {
 	response.Status = 200
 	response.Result = resultString
 	c.Bind(response)
-	if isSave == false {
-		db := initDb()
+	if isSave == true {
 		sqlStatement := "insert into math_results (first_number, second_number, result, operation) " +
 			"values ($1, $2, $3, $4);"
 		_, err := db.Query(sqlStatement, calc.First, calc.Second, resultString, calc.Operation)
@@ -131,9 +129,14 @@ func mathFunc(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+var db *sql.DB
+
 func main() {
 	// Echo Instance Initializing
 	e := echo.New()
+
+	// Initializing Database
+	db = initDb()
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
