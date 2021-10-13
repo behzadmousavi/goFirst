@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 )
@@ -89,7 +90,8 @@ func divideNumber(c echo.Context) error {
 func mathFunc(c echo.Context) error {
 	calc := calculation{}
 	response := calcResp{}
-	err := json.NewDecoder(c.Request().Body).Decode(&calc)
+	body, _ := ioutil.ReadAll(c.Request().Body)
+	err := json.Unmarshal(body, &calc)
 	firstNumber := calc.First
 	secondNumber := calc.Second
 	mathType := calc.Operation
@@ -117,7 +119,7 @@ func mathFunc(c echo.Context) error {
 	resultString := strconv.FormatFloat(result, 'f', -1, 64)
 	response.Status = 200
 	response.Result = resultString
-	c.Bind(response)
+	json.Marshal(response)
 	if isSave == true {
 		sqlStatement := "insert into math_results (first_number, second_number, result, operation) " +
 			"values ($1, $2, $3, $4);"
