@@ -31,15 +31,6 @@ type calcResp struct {
 	Result string `json:"result"`
 }
 
-func addNumber(c echo.Context) error {
-	firstNumber := c.QueryParam("first")
-	secondNumber := c.QueryParam("second")
-	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 64)
-	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 64)
-	summation := float64(firstNumberFloat + secondNumberFloat)
-	return c.JSON(http.StatusOK, summation)
-}
-
 func initDb() *sql.DB {
 	// DB Initializing
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -55,6 +46,15 @@ func initDb() *sql.DB {
 	}
 	fmt.Println("Successfully connected!")
 	return db
+}
+
+func addNumber(c echo.Context) error {
+	firstNumber := c.QueryParam("first")
+	secondNumber := c.QueryParam("second")
+	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 64)
+	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 64)
+	summation := float64(firstNumberFloat + secondNumberFloat)
+	return c.JSON(http.StatusOK, summation)
 }
 
 func deductNumber(c echo.Context) error {
