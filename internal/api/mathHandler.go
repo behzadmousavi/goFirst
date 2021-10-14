@@ -1,4 +1,4 @@
-package internal
+package api
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+//Definition of body structure
 type calculation struct {
 	First     float64 `json:"first"`
 	Second    float64 `json:"second"`
@@ -15,21 +16,35 @@ type calculation struct {
 	IsSave    bool    `json:"is_save"`
 }
 
+//Definition of response structure
 type calcResp struct {
 	Status int    `json:"status"`
 	Result string `json:"result"`
 }
 
 func MathFunc(c echo.Context) error {
+	// DB Initializing
 	db := InitDb()
+
+	//Body structure assigning
 	calc := calculation{}
+
+	//Response structure assigning
 	response := calcResp{}
+
+	//Fetching request body
 	body, _ := ioutil.ReadAll(c.Request().Body)
+
+	//Converting body to json
 	err := json.Unmarshal(body, &calc)
+
+	//Parsing body values
 	firstNumber := calc.First
 	secondNumber := calc.Second
 	mathType := calc.Operation
 	isSave := calc.IsSave
+
+	//Performing mathematical operations in regards to the selected operation
 	var result string
 	switch mathType {
 	case "add":
@@ -44,10 +59,15 @@ func MathFunc(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "")
 	}
-	//resultString := strconv.FormatFloat(result, 'f', -1, 64)
+
+	//Filling response values
 	response.Status = 200
 	response.Result = result
+
+	//Converting response to json
 	json.Marshal(response)
+
+	//Inserting the response into the DB
 	if isSave == true {
 		sqlStatement := "insert into math_results (first_number, second_number, result, operation) " +
 			"values ($1, $2, $3, $4);"
@@ -56,5 +76,7 @@ func MathFunc(c echo.Context) error {
 			fmt.Println(err)
 		}
 	}
+
+	//Returning response json
 	return c.JSON(http.StatusOK, response)
 }

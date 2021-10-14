@@ -1,7 +1,8 @@
-package internal
+package api
 
 import "strconv"
 
+//Defines four main arithmetic operations
 func addition(a float64, b float64) string {
 	result := a + b
 	resultStr := strconv.FormatFloat(result, 'f', -1, 64)

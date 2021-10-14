@@ -1,15 +1,15 @@
-package internal
+package api
 
 import (
 	"database/sql"
 	"fmt"
+	"github.com/behzadmousavi/goFirst/internal/configs"
 )
 
 func InitDb() *sql.DB {
-	// DB Initializing
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		internal.configs.Host, port, user, password, dbname)
+		configs.Host, configs.Port, configs.User, configs.Password, configs.Dbname)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
