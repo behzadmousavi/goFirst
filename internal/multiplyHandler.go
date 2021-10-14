@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"github.com/labstack/echo/v4"
@@ -6,11 +6,11 @@ import (
 	"strconv"
 )
 
-func subtractNumber(c echo.Context) error {
+func MultiplyNumber(c echo.Context) error {
 	firstNumber := c.QueryParam("first")
 	secondNumber := c.QueryParam("second")
 	firstNumberFloat, _ := strconv.ParseFloat(firstNumber, 64)
 	secondNumberFloat, _ := strconv.ParseFloat(secondNumber, 64)
-	deduction := firstNumberFloat - secondNumberFloat
-	return c.JSON(http.StatusOK, deduction)
+	result := multiplication(firstNumberFloat, secondNumberFloat)
+	return c.JSON(http.StatusOK, result)
 }
