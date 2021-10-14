@@ -1,4 +1,4 @@
-package internal
+package configs
 
 type database struct {
 	Username string `default:"postgres"`
